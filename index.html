@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生心理健康测评</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .intro {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .intro h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .intro ul {
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .intro li {
+            margin-bottom: 8px;
+        }
+
+        .question-container {
+            display: none;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 18px 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            display: none;
+            text-align: center;
+        }
+
+        .result.active {
+            display: block;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-number {
+            font-size: 3.5em;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .result-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .result-description {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .suggestions {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .suggestions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .suggestions ul {
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .suggestions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .disclaimer h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer p {
+            color: #856404;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .helpline {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .helpline h4 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .helpline p {
+            color: #155724;
+            font-size: 1em;
+            line-height: 1.8;
+        }
+
+        .helpline strong {
+            font-size: 1.2em;
+        }
+
+        .restart-btn {
+            background: #6c757d;
+            margin-top: 20px;
+        }
+
+        .dimension-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .dimension-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .dimension-name {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .dimension-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .content {
+                padding: 25px 20px;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-number {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌱 学生心理健康测评</h1>
+            <p>关爱心理健康，从了解自己开始</p>
+        </header>
+
+        <div class="content">
+            <!-- 介绍页面 -->
+            <div id="intro" class="intro">
+                <h3>📋 测评说明</h3>
+                <ul>
+                    <li>本测评共 <strong>13 道题</strong>，预计耗时 <strong>3-5 分钟</strong></li>
+                    <li>请根据你 <strong>最近两周</strong> 的实际感受作答</li>
+                    <li>答案无对错之分，请如实选择</li>
+                    <li>测评结果仅供参考，不能替代专业诊断</li>
+                    <li>所有数据仅在本地处理，不会上传</li>
+                </ul>
+                <button class="btn" onclick="startQuiz()">开始测评</button>
+            </div>
+
+            <!-- 答题区域 -->
+            <div id="quiz-container" style="display: none;">
+                <div class="progress-text">
+                    进度：<span id="current-question">1</span> / <span id="total-questions">13</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 7.7%"></div>
+                </div>
+
+                <div id="questions-wrapper">
+                    <!-- 问题将通过 JavaScript 动态生成 -->
+                </div>
+
+                <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>下一题</button>
+            </div>
+
+            <!-- 结果页面 -->
+            <div id="result" class="result">
+                <div class="score-circle">
+                    <div class="score-number" id="total-score">0</div>
+                    <div class="score-label">总分</div>
+                </div>
+
+                <h2 class="result-title" id="result-title">测评结果</h2>
+                <p class="result-description" id="result-description"></p>
+
+                <div class="dimension-scores" id="dimension-scores">
+                    <!-- 维度分数将动态生成 -->
+                </div>
+
+                <div class="suggestions">
+                    <h3>💡 建议</h3>
+                    <ul id="suggestions-list">
+                        <!-- 建议将动态生成 -->
+                    </ul>
+                </div>
+
+                <div class="disclaimer">
+                    <h4>⚠️ 重要提示</h4>
+                    <p>
+                        本测评仅用于初步了解心理健康状态，<strong>不能作为诊断依据</strong>。
+                        心理健康评估需要由专业心理咨询师或精神科医生进行面对面评估。
+                        如感到困扰，请及时寻求专业帮助。
+                    </p>
+                </div>
+
+                <div class="helpline">
+                    <h4>📞 心理援助热线</h4>
+                    <p>
+                        <strong>全国希望 24 热线：</strong>400-161-9995<br>
+                        <strong>青少年心理咨询：</strong>12355<br>
+                        <strong>北京心理危机干预中心：</strong>010-82951332<br>
+                        <strong>简单心理免费热线：</strong>400-650-6066
+                    </p>
+                </div>
+
+                <button class="btn restart-btn" onclick="restartQuiz()">重新测评</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 测评题目数据
+        const questions = [
+            // 情绪状态维度 (4 题)
+            {
+                dimension: "情绪状态",
+                text: "我感到情绪低落、沮丧或绝望",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "情绪状态",
+                text: "我对平时感兴趣的事情失去了兴趣或乐趣",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "情绪状态",
+                text: "我感到自己很失败，或让自己和家人失望",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "情绪状态",
+                text: "我觉得生活没有希望，未来很暗淡",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            // 焦虑水平维度 (3 题)
+            {
+                dimension: "焦虑水平",
+                text: "我感到紧张、焦虑或不安",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "焦虑水平",
+                text: "我无法控制或停止担忧",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "焦虑水平",
+                text: "我对很多事情过分担忧",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            // 压力与睡眠维度 (3 题)
+            {
+                dimension: "压力与睡眠",
+                text: "我感到压力很大，难以应对日常事务",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "压力与睡眠",
+                text: "我的睡眠质量不好（难以入睡、易醒或早醒）",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "压力与睡眠",
+                text: "我感到疲劳或缺乏精力",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            // 社交与动力维度 (3 题)
+            {
+                dimension: "社交与动力",
+                text: "我不想与人交流，想独自待着",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "社交与动力",
+                text: "我学习或做事时难以集中注意力",
+                options: ["从不", "很少", "有时", "经常"]
+            },
+            {
+                dimension: "社交与动力",
+                text: "我觉得活着很累，没有什么值得期待的",
+                options: ["从不", "很少", "有时", "经常"]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let answers = [];
+        let dimensionScores = {};
+
+        // 初始化测评
+        function initQuiz() {
+            document.getElementById('total-questions').textContent = questions.length;
+            renderQuestions();
+        }
+
+        // 渲染所有问题
+        function renderQuestions() {
+            const wrapper = document.getElementById('questions-wrapper');
+            wrapper.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const container = document.createElement('div');
+                container.className = `question-container ${index === 0 ? 'active' : ''}`;
+                container.id = `question-${index}`;
+
+                container.innerHTML = `
+                    <div class="question-number">问题 ${index + 1}</div>
+                    <div class="question-text">${q.text}</div>
+                    <div class="options">
+                        ${q.options.map((opt, optIndex) => `
+                            <div class="option" onclick="selectOption(${index}, ${optIndex})">
+                                ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                wrapper.appendChild(container);
+            });
+        }
+
+        // 开始测评
+        function startQuiz() {
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            currentQuestionIndex = 0;
+            answers = new Array(questions.length).fill(null);
+        }
+
+        // 选择选项
+        function selectOption(questionIndex, optionIndex) {
+            answers[questionIndex] = optionIndex + 1; // 1-4 分
+
+            // 更新 UI
+            const container = document.getElementById(`question-${questionIndex}`);
+            const options = container.querySelectorAll('.option');
+            options.forEach((opt, idx) => {
+                opt.classList.toggle('selected', idx === optionIndex);
+            });
+
+            // 启用下一题按钮
+            document.getElementById('next-btn').disabled = false;
+
+            // 如果是最后一题，改变按钮文字
+            const nextBtn = document.getElementById('next-btn');
+            if (questionIndex === questions.length - 1) {
+                nextBtn.textContent = '查看结果';
+            } else {
+                nextBtn.textContent = '下一题';
+            }
+        }
+
+        // 下一题
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                // 隐藏当前问题
+                document.getElementById(`question-${currentQuestionIndex}`).classList.remove('active');
+                
+                currentQuestionIndex++;
+                
+                // 显示下一问题
+                document.getElementById(`question-${currentQuestionIndex}`).classList.add('active');
+                
+                // 更新进度
+                document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+                document.getElementById('progress-fill').style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+                
+                // 重置下一题按钮状态
+                document.getElementById('next-btn').disabled = true;
+            } else {
+                // 完成测评，显示结果
+                calculateAndShowResult();
+            }
+        }
+
+        // 计算并显示结果
+        function calculateAndShowResult() {
+            // 计算总分
+            const totalScore = answers.reduce((sum, answer) => sum + answer, 0);
+
+            // 计算各维度分数
+            dimensionScores = {};
+            questions.forEach((q, index) => {
+                if (!dimensionScores[q.dimension]) {
+                    dimensionScores[q.dimension] = 0;
+                }
+                dimensionScores[q.dimension] += answers[index];
+            });
+
+            // 隐藏答题区，显示结果
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('result').classList.add('active');
+
+            // 设置总分
+            document.getElementById('total-score').textContent = totalScore;
+
+            // 根据总分确定结果等级
+            let resultTitle, resultDescription, suggestions, color;
+            
+            if (totalScore <= 25) {
+                resultTitle = "🟢 心理状态良好";
+                resultDescription = "你的心理健康状态整体良好！你能够较好地应对日常压力，情绪状态稳定。继续保持健康的生活方式，关注自我成长。";
+                suggestions = [
+                    "继续保持良好的作息习惯",
+                    "维持积极的社交活动",
+                    "培养兴趣爱好，丰富生活",
+                    "定期运动，保持身心健康",
+                    "学会感恩，记录生活中的美好"
+                ];
+                color = "#28a745";
+            } else if (totalScore <= 35) {
+                resultTitle = "🟡 轻度压力";
+                resultDescription = "你近期可能感受到一些压力或情绪波动，这是正常的。建议适当调整生活方式，关注自己的情绪变化，必要时可与信任的人交流。";
+                suggestions = [
+                    "保证充足睡眠（7-8 小时）",
+                    "每天进行 30 分钟适度运动",
+                    "练习深呼吸或冥想放松",
+                    "与朋友或家人分享感受",
+                    "合理安排学习和休息时间",
+                    "减少社交媒体使用，避免信息过载"
+                ];
+                color = "#ffc107";
+            } else if (totalScore <= 45) {
+                resultTitle = "🟠 中度困扰";
+                resultDescription = "你目前可能正经历一些心理困扰，这些感受值得重视。建议主动寻求支持，与信任的人交流，或考虑咨询专业心理咨询师。";
+                suggestions = [
+                    "尽快预约学校心理咨询中心",
+                    "建立规律的作息时间",
+                    "避免孤立自己，保持社交联系",
+                    "减少咖啡因和糖分摄入",
+                    "写日记记录情绪变化",
+                    "学习压力管理技巧",
+                    "如有需要，可拨打心理援助热线"
+                ];
+                color = "#fd7e14";
+            } else {
+                resultTitle = "🔴 高度困扰";
+                resultDescription = "你目前可能正经历较大的心理困扰，这些感受是真实且重要的。强烈建议尽快寻求专业帮助，心理咨询师或医生可以为你提供专业支持。";
+                suggestions = [
+                    "立即预约专业心理咨询师或精神科医生",
+                    "告诉信任的家人或朋友你的感受",
+                    "拨打心理援助热线获取即时支持",
+                    "避免独处，保持与他人联系",
+                    "如有自伤或自杀念头，请立即就医或拨打急救电话",
+                    "记住：寻求帮助是勇敢的表现，你并不孤单"
+                ];
+                color = "#dc3545";
+            }
+
+            // 设置结果内容
+            document.getElementById('result-title').textContent = resultTitle;
+            document.getElementById('result-title').style.color = color;
+            document.getElementById('result-description').textContent = resultDescription;
+
+            // 设置维度分数
+            const dimensionContainer = document.getElementById('dimension-scores');
+            dimensionContainer.innerHTML = '';
+            Object.entries(dimensionScores).forEach(([dim, score]) => {
+                const maxScore = questions.filter(q => q.dimension === dim).length * 4;
+                const percentage = (score / maxScore) * 100;
+                let dimColor = '#28a745';
+                if (percentage > 75) dimColor = '#dc3545';
+                else if (percentage > 50) dimColor = '#ffc107';
+
+                dimensionContainer.innerHTML += `
+                    <div class="dimension-item">
+                        <div class="dimension-name">${dim}</div>
+                        <div class="dimension-value" style="color: ${dimColor}">${score}/${maxScore}</div>
+                    </div>
+                `;
+            });
+
+            // 设置建议列表
+            const suggestionsList = document.getElementById('suggestions-list');
+            suggestionsList.innerHTML = suggestions.map(s => `<li>${s}</li>`).join('');
+        }
+
+        // 重新测评
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            answers = new Array(questions.length).fill(null);
+            
+            document.getElementById('result').classList.remove('active');
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('current-question').textContent = 1;
+            document.getElementById('progress-fill').style.width = '7.7%';
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').textContent = '下一题';
+            
+            // 重置所有选项
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // 显示第一题
+            document.querySelectorAll('.question-container').forEach((container, index) => {
+                container.classList.toggle('active', index === 0);
+            });
+        }
+
+        // 初始化
+        initQuiz();
+    </script>
+</body>
+</html>
